@@ -14,12 +14,15 @@ Private Sub Process_CRs_Click()
             Select Case bp_cr.CodeName
                 Case "Sheet5", "Sheet8", "Sheet111", "Sheet14"
                 With bp_cr
+                
                     For h_i = 1 To 2 
                         i = 2 ' Skip Headers
-                        ' Iterate through the records
+                
+                        ' Iterate through the records capturing ID, and WR info
                         Do Until IsEmpty(.Cells(i, 1))
                             cur_id = .Cells(i, 1)    ' 1 = CR_ID
                             cur_type = .Cells(i, 12) ' 12 = WR_type
+                
                             ' If key found, backtrack to acertain removal criteria satisfied
                             If cur_type = "Solution" And i > 2 Then
                                  j = i - 1
@@ -35,8 +38,10 @@ Private Sub Process_CRs_Click()
                             i = i + 1
                         Loop
                     Next h_i 
+                    
                     ' Remove the dups on CR_ID criteria
                     .Cells.RemoveDuplicates Columns:=Array(1) 
+                    
                 End With
             End Select
         Next bp_cr
