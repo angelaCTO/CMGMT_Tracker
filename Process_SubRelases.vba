@@ -1,7 +1,7 @@
-Private Sub Process_Rolls_Click() 
+Private Sub Process_Rolls_Click() 'TODO Refractor
 
     ' Optimization Attempt - Disable all automatic events until all sheets
-    ' have been processed. Counts will update by macros upon completion
+    ' have been processed. Counts will update automatically upon completion
     With Application
         .Calculation = xlCalculationManual
         .ScreenUpdating = False
@@ -25,12 +25,14 @@ Private Sub Process_Rolls_Click()
                 new_wb.SaveAs Filename:=fpath, FileFormat:=xlOpenXMLWorkbookMacroEnabled
             End If
         End With
-      
-        ' Note here, need to close and reopen wb again to avoid 'Runtime Error 1004'
+        
+    
+        ' Note here, need to close and reopen wb again to avoid Excel
+        ' Runtime Error 1004 (User)
         new_wb.Close SaveChanges:=True
         Set new_wb = Workbooks.Open(Filename:=fpath)
     
-        ' Create the new sheets in the new workbook
+        ' Create the new sheets
         Dim s_sht As Worksheet, c_sht As Worksheet, e_sht As Worksheet, cd_sht As Worksheet
         With new_wb
             Set e_sht = .Sheets.Add(After:=.Sheets(.Sheets.Count))  'codename = sheet 2
@@ -59,8 +61,10 @@ Private Sub Process_Rolls_Click()
         cdi = 2
         cdx = 0
      
-        ' Copy data to each corresponding roll sheet, copying headers first then records
+        ' Copy data to each corresponding roll sheet
         With ThisWorkbook.Sheets("Sheet1") 'TODO Rename To "Total"
+        
+            ' Copy headers
             .Cells(1, 1).EntireRow.Copy
             e_sht.Paste Destination:=e_sht.Cells(1, 1).EntireRow
             .Cells(1, 1).EntireRow.Copy
@@ -70,32 +74,25 @@ Private Sub Process_Rolls_Click()
             .Cells(1, 1).EntireRow.Copy
             cd_sht.Paste Destination:=cd_sht.Cells(1, 1).EntireRow
         
+            ' Copy records
             Do Until IsEmpty(.Cells(i, 1))
                 If InStr(.Cells(i, 4), "E") <> 0 Then
-                    If InStr(.Cells(i, 4), "xx") <> 0 Then
-                        ex = ex + 1
-                    End If
+                    If InStr(.Cells(i, 4), "xx") <> 0 Then ex = ex + 1
                     .Cells(i, 1).EntireRow.Copy
                     e_sht.Paste Destination:=e_sht.Cells(ei, 1).EntireRow
                     ei = ei + 1
                 ElseIf InStr(.Cells(i, 4), "S") <> 0 Then
-                    If InStr(.Cells(i, 4), "xx") <> 0 Then
-                        sx = sx + 1
-                    End If
+                    If InStr(.Cells(i, 4), "xx") <> 0 Then sx = sx + 1
                     .Cells(i, 1).EntireRow.Copy
                     s_sht.Paste Destination:=s_sht.Cells(si, 1).EntireRow
                     si = si + 1
                 ElseIf InStr(.Cells(i, 4), "CD") <> 0 Then
-                    If InStr(.Cells(i, 4), "xx") <> 0 Then
-                        cdx = cdx + 1
-                    End If
+                    If InStr(.Cells(i, 4), "xx") <> 0 Then cdx = cdx + 1
                     .Cells(i, 1).EntireRow.Copy
                     cd_sht.Paste Destination:=cd_sht.Cells(cdi, 1).EntireRow
                     cdi = cdi + 1
                 Else
-                    If InStr(.Cells(i, 4), "xx") <> 0 Then
-                        cx = cx + 1
-                    End If
+                    If InStr(.Cells(i, 4), "xx") <> 0 Then cx = cx + 1
                     .Cells(i, 1).EntireRow.Copy
                     c_sht.Paste Destination:=c_sht.Cells(ci, 1).EntireRow
                     ci = ci + 1
@@ -104,7 +101,8 @@ Private Sub Process_Rolls_Click()
             Loop
         End With
         
-        ' Write the Roll Counts into Sheet1
+    
+        ' Write the counts into Sheet1
         With new_wb.Sheets("Sheet1")
             Dim e_counts As String
             e_counts = "Total = " & (ei - 2) & " Committed = " & ((ei - 2) - ex)
@@ -127,9 +125,10 @@ Private Sub Process_Rolls_Click()
             .Range("A11") = cd_counts
         End With
         
-        ' Close the current workbook, but keep new workbook open. 
-        .CutCopyMode = False ' Disable annoying pop-up
-        'new_wb.Close SaveChanges:=True
+        ' Close the current workbook, but keep new open. Also, disable annoying pop-up
+        .CutCopyMode = False
+        
+        new_wb.Close SaveChanges:=True
         ThisWorkbook.Close SaveChanges:=True
         
         ' Return Application To Original State
