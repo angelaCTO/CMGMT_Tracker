@@ -7,11 +7,13 @@ Private Sub Process_Rolls_Click() 'TODO Refractor
         .ScreenUpdating = False
         .EnableEvents = False
 
+
         ' Create a new workbook
         Dim new_wb As Workbook
         Set new_wb = Workbooks.Add
     
-        'Save to user selected designated path, named by date
+    
+        ' Save to user selected designated path, named by date
         Dim fname As String, fpath As String
         fname = VBA.Format(DateSerial(Year(Date), Month(Date), Day(Date)), "mm-dd-yyyy")
         fname = fname & "-CESrolls"
@@ -31,6 +33,7 @@ Private Sub Process_Rolls_Click() 'TODO Refractor
         ' Runtime Error 1004 (User)
         new_wb.Close SaveChanges:=True
         Set new_wb = Workbooks.Open(Filename:=fpath)
+    
     
         ' Create the new sheets
         Dim s_sht As Worksheet, c_sht As Worksheet, e_sht As Worksheet, cd_sht As Worksheet
@@ -61,8 +64,9 @@ Private Sub Process_Rolls_Click() 'TODO Refractor
         cdi = 2
         cdx = 0
      
+     
         ' Copy data to each corresponding roll sheet
-        With ThisWorkbook.Sheets("Sheet1") 'TODO Rename To "Total"
+        With ThisWorkbook.Sheets("Sheet1") ' TODO Rename To "Total"
         
             ' Copy headers
             .Cells(1, 1).EntireRow.Copy
@@ -125,9 +129,9 @@ Private Sub Process_Rolls_Click() 'TODO Refractor
             .Range("A11") = cd_counts
         End With
         
+        
         ' Close the current workbook, but keep new open. Also, disable annoying pop-up
         .CutCopyMode = False
-        
         new_wb.Close SaveChanges:=True
         ThisWorkbook.Close SaveChanges:=True
         
@@ -135,5 +139,6 @@ Private Sub Process_Rolls_Click() 'TODO Refractor
         .Calculation = xlCalculationAutomatic
         .ScreenUpdating = True
         .EnableEvents = True
+
     End With
 End Sub
